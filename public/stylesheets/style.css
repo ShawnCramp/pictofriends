@@ -1,0 +1,72 @@
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+*, *:before, *:after {
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit; }
+
+body {
+  font: Helvetica, Arial;
+  padding-left: 2em;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+/*.debug {
+  border: 1px solid red; }*/
+
+a {
+  color: #00B7FF;
+}
+
+canvas {
+  border: 2px solid #C4F3DA;
+}
+
+.input-box {
+  padding: 3px;
+}
+
+.chatbox {
+  disply: inline;
+  height: 35em;
+  width: 30em;
+  border: 1px solid rgb(130, 224, 255);
+}
+
+.send-chat {
+  padding-top: 2em;
+}
+
+#message {
+  width: 400px;
+  line-height: 25px;
+}
+
+button {
+  width: 50px;
+  background: rgb(130, 224, 255);
+  border: none;
+  padding: 10px;
+}
+
+.toolbar {
+  width: 500px;
+  height: 50px;
+  border: 1px solid #75E1CF;
+}
+
+.tool {
+  display: inline-block;
+  margin: 10px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  border: 1px dotted gray;
+}
+
+.username-container {
+  padding-bottom: 1em;
+}
