@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
 // Capture the DOM elements
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
@@ -12,12 +12,14 @@ $(document).ready(function() {
 
 // Listen for draw messages from server
     socket.on('draw', function (data) {
-        console.log("on draw from the client")
+        console.log("User Drew Something...");
         draw(data);
     });
 
+
+
 // Begin draw
-    $canvas.mousedown(function(event) {
+    $canvas.mousedown(function (event) {
         drawing = true;
 
         currentX = event.pageX - this.offsetLeft;
@@ -26,27 +28,27 @@ $(document).ready(function() {
     });
 
 // End draw
-    $canvas.mouseup(function(event) {
+    $canvas.mouseup(function (event) {
         drawing = false;
-    })
+    });
 
-    $canvas.mouseleave(function(event) {
+    $canvas.mouseleave(function (event) {
         drawing = false
-    })
+    });
 
-// Pick color and line width
-    $(".color").on('click', function(event) {
+    // Pick color and line width
+    $(".color").on('click', function (event) {
         event.preventDefault();
-        strokeStyle = $(this).css( "background-color" )
-    })
+        strokeStyle = $(this).css("background-color")
+    });
 
-    $(".line-width").on('click', function(event) {
+    $(".line-width").on('click', function (event) {
         event.preventDefault();
         lineWidth = $(this).attr('id')
-    })
+    });
 
 // Set x/y coordinates and send data to server
-    $canvas.mousemove(function(event){
+    $canvas.mousemove(function (event) {
 
         if (drawing) {
             prevX = currentX;
@@ -60,7 +62,7 @@ $(document).ready(function() {
                 prevX: prevX,
                 prevY: prevY,
                 strokeStyle: strokeStyle,
-                lineWidth: lineWidth,
+                lineWidth: lineWidth
             });
             console.log("from emit");
         }
@@ -79,24 +81,24 @@ $(document).ready(function() {
         ctx.stroke();
     }
 
-// Set username
+    // Set username
     var username;
-    $('form.username').submit(function(event) {
+    $('form.username').submit(function (event) {
         event.preventDefault();
         name = $('#name').val();
         $(this).hide();
 
         // Emit that user has joined
-        var user = {name: name}
+        var user = {name: name};
         socket.emit('user joined', user);
-    })
+    });
 
 // Send chat messages
-    $('form.send-chat').submit(function() {
+    $('form.send-chat').submit(function () {
         var message = {
             name: name,
             text: $('#message').val()
-        }
+        };
 
         socket.emit('chat message', message);
         $('#message').val('');
@@ -104,13 +106,29 @@ $(document).ready(function() {
     });
 
     // Update chatbox to show user has joined
-    socket.on('user joined', function(user) {
+    socket.on('user joined', function (user) {
         $('#chatbox').append("<p>" + user.name + " has joined the chatroom</p>");
-    })
+        $('#userlist').append("<li>" + user.name + "</li>");
+    });
 
-// Listen for chat messages
-    socket.on('chat message', function(message) {
+    // Update chatbox to show user has left
+    socket.on('user left', function () {
+        $('#chatbox').append("<p> A User has Disconnected</p>");
+    });
+
+    // Listen for chat messages
+    socket.on('chat message', function (message) {
         $('#chatbox').append("<p>" + message.name + ": " + message.text + "</p>");
     });
+
+    // Listen for UserCount change
+    socket.on('user count', function (count) {
+        $('#usercount').html(count);
+    })
+
+    // Call on Browser Closure
+    window.onbeforeunload = function() {
+        socket.emit('user left', name);
+    };
 
 }); // end document ready

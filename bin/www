@@ -33,9 +33,13 @@ server.on('listening', onListening);
  * Socket.io
  */
 var io = require('socket.io').listen(server.listen(port));
+var usercount = 0;
+var userlist = [];
 
 io.sockets.on("connection", function (socket) {
-    // console.log("This should happen in the server");
+    console.log("A User has Connected");
+    usercount += 1;
+    io.emit('user count', usercount);
 
     // Listen/emit for Canvas
     socket.on('draw', function (data) {
@@ -51,8 +55,25 @@ io.sockets.on("connection", function (socket) {
 
     // Listen and emit that user joined
     socket.on('user joined', function(user) {
+        userlist.push(user.name);
         io.emit('user joined', user)
-    })
+    });
+
+    // Listen and emit that user has left
+    socket.on('user left', function(user) {
+        console.log('User Left');
+        console.log(user);
+        userlist.pop(user);
+        io.emit('user left', user);
+    });
+
+    // List and emit that User Disconnected
+    socket.on('disconnect', function(user) {
+        console.log("User Disconnected");
+        // console.log(user);
+        usercount -= 1;
+        io.emit('user count', userlist.length);
+    });
 });
 
 
