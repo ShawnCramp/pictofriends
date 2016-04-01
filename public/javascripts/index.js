@@ -106,14 +106,27 @@ $(document).ready(function () {
     });
 
     // Update chatbox to show user has joined
-    socket.on('user joined', function (user) {
+    socket.on('user joined', function (user, userlist) {
         $('#chatbox').append("<p>" + user.name + " has joined the chatroom</p>");
-        $('#userlist').append("<li>" + user.name + "</li>");
+
+        $('#userlist').html("");
+
+        for (var i = 0; i < userlist.length; i++) {
+            $('#userlist').append("<li>" + userlist[i] + "</li>");
+        }
+
     });
 
     // Update chatbox to show user has left
-    socket.on('user left', function () {
-        $('#chatbox').append("<p> A User has Disconnected</p>");
+    socket.on('user left', function (user, userlist) {
+        $('#chatbox').append("<p>" + user + "  has Disconnected</p>");
+
+        $('#userlist').html("");
+
+        for (var i = 0; i < userlist.length; i++) {
+            $('#userlist').append("<li>" + userlist[i] + "</li>");
+        }
+
     });
 
     // Listen for chat messages
@@ -124,7 +137,7 @@ $(document).ready(function () {
     // Listen for UserCount change
     socket.on('user count', function (count) {
         $('#usercount').html(count);
-    })
+    });
 
     // Call on Browser Closure
     window.onbeforeunload = function() {

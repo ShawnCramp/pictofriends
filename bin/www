@@ -55,23 +55,32 @@ io.sockets.on("connection", function (socket) {
 
     // Listen and emit that user joined
     socket.on('user joined', function(user) {
+
+        // Add User to Userlist
         userlist.push(user.name);
-        io.emit('user joined', user)
+
+        // Log Userlist for Debug
+        console.log("User List: " + userlist);
+
+        io.emit('user joined', user, userlist)
     });
 
     // Listen and emit that user has left
     socket.on('user left', function(user) {
         console.log('User Left');
         console.log(user);
+
+        // Edit Userlist
         userlist.pop(user);
-        io.emit('user left', user);
+        console.log("User List: " + userlist);
+
+        io.emit('user left', user, userlist);
     });
 
     // List and emit that User Disconnected
     socket.on('disconnect', function(user) {
         console.log("User Disconnected");
-        // console.log(user);
-        usercount -= 1;
+        console.log("User List Length: " + userlist.length.toString());
         io.emit('user count', userlist.length);
     });
 });
