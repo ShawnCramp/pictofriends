@@ -39,7 +39,7 @@ var userlist = [];
 io.sockets.on("connection", function (socket) {
     console.log("A User has Connected");
     usercount += 1;
-    io.emit('user count', usercount);
+    io.emit('user count', userlist.length);
 
     // Listen/emit for Canvas
     socket.on('draw', function (data) {

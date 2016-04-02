@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+    <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <!-- Font Awesome -->
+    <script src="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"></script>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -13,29 +18,33 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
     <title><%= title %></title>
-    <script src="/javascripts/index.js"></script>
+    <script src="/javascripts/home.js"></script>
+    <link rel='stylesheet' href='/stylesheets/trg.css'/>
     <link rel='stylesheet' href='/stylesheets/style.css'/>
+
+    <style>
+        .hero {
+            background-color: #0b97c4;
+            width: 100%;
+        }
+
+        .picto-contain {
+            background-color: white;
+            height: 100%;
+        }
+    </style>
+
 </head>
-<body>
-<div class="container">
-    <h1 class="text-center text-uppercase"><%= title %></h1>
+<body class="hero">
+    <div class="container picto-contain">
+        <div class="row">
+            <h1 class="text-center text-uppercase"><%= title %></h1>
+            <h2 class="text-center text-uppercase"><a href="/picto">Play</a></h2>
+            <h2 class="text-center text-uppercase"><a href="/freedraw">Free Draw</a></h2>
+            <h2 class="text-center text-uppercase"><a href="#">Instructions</a></h2>
 
-    <div class="row">
-        <form class="username">
-            <p>Enter a username!</p>
-            <label for="name">Name:</label>
-            <input id="name" type="text"/>
-            <input class="btn btn-primary" id="submit-name" type="submit"/>
-        </form>
+        </div>
     </div>
-    <div class="row" align="center">
-        <% include partials/canvas %>
-    </div>
-    <div class="row" align="center">
-        <% include partials/chat %>
-    </div>
-</div>
-
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 </body>
 </html>

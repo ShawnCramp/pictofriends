@@ -14,13 +14,17 @@
 
     <title><%= title %></title>
     <script src="/javascripts/index.js"></script>
+    <link rel='stylesheet' href='/stylesheets/trg.css'/>
     <link rel='stylesheet' href='/stylesheets/style.css'/>
 </head>
-<body>
-<div class="container">
-    <h1 class="text-center text-uppercase"><%= title %></h1>
 
-    <div class="row">
+<body>
+<div class="container debug">
+    <h1><%= title %></h1>
+</div>
+
+<div class="debug">
+    <div class="row username-container">
         <form class="username">
             <p>Enter a username!</p>
             <label for="name">Name:</label>
@@ -28,12 +32,10 @@
             <input class="btn btn-primary" id="submit-name" type="submit"/>
         </form>
     </div>
-    <div class="row" align="center">
-        <% include partials/canvas %>
-    </div>
-    <div class="row" align="center">
-        <% include partials/chat %>
-    </div>
+
+    <% include partials/canvas %>
+
+    <% include partials/chat %>
 </div>
 
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>

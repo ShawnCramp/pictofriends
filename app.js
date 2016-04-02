@@ -6,15 +6,11 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var engine = require('ejs-locals');
 
-
-// MongoDB
-/*
-var monger = require('mongodb');
-var monk = require('monk');
-var db = monk('//localhost/27017/whiteboard');
-*/
-
+// Routes For Viewsets
+var home = require('./routes/home');
 var routes = require('./routes/index');
+var freedraw = require('./routes/freedraw');
+
 var users = require('./routes/users');
 
 var app = express();
@@ -32,7 +28,10 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+app.use('/', home);
+app.use('/picto', routes);
+app.use('/freedraw', freedraw);
+
 app.use('/users', users);
 
 // catch 404 and forward to error handler
