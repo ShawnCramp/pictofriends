@@ -8,7 +8,7 @@ $(document).ready(function () {
     var drawing;
 
 // Set the client-side connection
-    var socket = io.connect('http://localhost:3000');
+    var socket = io.connect('http://localhost:3000/picto');
 
 // Listen for draw messages from server
     socket.on('draw', function (data) {
@@ -100,8 +100,18 @@ $(document).ready(function () {
             text: $('#message').val()
         };
 
-        socket.emit('chat message', message);
-        $('#message').val('');
+        if (message.name != "") {
+            console.log("Message Sent");
+            console.log(message.name);
+
+            socket.emit('chat message', message);
+            $('#message').val('');
+        } else {
+            console.log("Must enter Username");
+
+            $('#chatbox').append("<p>You must enter a username to chat</p>");
+        }
+
         return false;
     });
 

@@ -1,6 +1,20 @@
 #!/usr/bin/env node
 
 /**
+ * Define Array Remove
+ */
+Array.prototype.remove = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+};
+
+/**
  * Module dependencies.
  */
 
@@ -36,24 +50,40 @@ var io = require('socket.io').listen(server.listen(port));
 var usercount = 0;
 var userlist = [];
 
+/**
+ * Socket.io Event Handler
+ */
 io.sockets.on("connection", function (socket) {
+
+    /* ---------------------------
+        Run On Socket Connection
+    --------------------------- */
     console.log("A User has Connected");
     usercount += 1;
     io.emit('user count', userlist.length);
 
-    // Listen/emit for Canvas
+
+    /**
+     *  Listen/emit for Canvas
+     */
     socket.on('draw', function (data) {
         console.log("on draw from the server");
         // Data is sent in as: {x: data.x, y: data.y, type: data.type }
         io.emit('draw', data);
     });
 
-    // Listen/emit for Chat
+
+    /**
+     *  Listen/emit for Chat
+     */
     socket.on('chat message', function(message){
         io.emit('chat message', message);
     });
 
-    // Listen and emit that user joined
+
+    /**
+     *  Listen and emit that user joined
+     */
     socket.on('user joined', function(user) {
 
         // Add User to Userlist
@@ -65,25 +95,34 @@ io.sockets.on("connection", function (socket) {
         io.emit('user joined', user, userlist)
     });
 
-    // Listen and emit that user has left
+    /**
+     *  Listen and emit that user has left
+     */
     socket.on('user left', function(user) {
         console.log('User Left');
         console.log(user);
 
         // Edit Userlist
-        userlist.pop(user);
-        console.log("User List: " + userlist);
+        if (user != "") {
+            userlist.remove(user);
+            console.log("User List: " + userlist);
+        }
 
         io.emit('user left', user, userlist);
     });
 
-    // List and emit that User Disconnected
+
+    /**
+     *  List and emit that User Disconnected
+     */
     socket.on('disconnect', function(user) {
         console.log("User Disconnected");
         console.log("User List Length: " + userlist.length.toString());
         io.emit('user count', userlist.length);
     });
 });
+
+
 
 
 /**

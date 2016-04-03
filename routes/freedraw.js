@@ -5,7 +5,7 @@ var app = require('../app');
 /* GET home page. */
 router.get('/', function (req, res, next) {
     console.log(req.cookies['connect.sid']);
-    res.render('index', {title: 'PictoFriends', name: ''});
+    res.render('index', {title: 'PictoFriends | Freedraw', name: ''});
 });
 
 module.exports = router;
