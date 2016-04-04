@@ -206,6 +206,7 @@ var picto = io
             console.log("Current Drawing User: " + drawingUser);
             console.log("Current Drawing: " + drawingList[drawingIndex]);
 
+            picto.emit('startingNotify');
             picto.emit('winnerNotify', name);
             picto.emit('drawingUser', drawingList[drawingIndex], drawingUser);
         }

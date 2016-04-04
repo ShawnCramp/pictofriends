@@ -10,7 +10,7 @@ $(document).ready(function () {
     var drawing;
 
     // Set the client-side connection
-    var socket = io.connect('http://localhost:3000/picto');
+    var socket = io.connect('http://localhost:7292/picto');
 
     // Listen for draw messages from server
     socket.on('draw', function (data) {
@@ -71,6 +71,8 @@ $(document).ready(function () {
 
     // Draw using the x/y coordinates
     function draw(data) {
+        console.log(data.x);
+        console.log(data.y);
         ctx.beginPath();
         ctx.strokeStyle = data.strokeStyle;
         ctx.lineJoin = "round";
@@ -110,6 +112,12 @@ $(document).ready(function () {
             console.log("Must enter Username");
 
             $('#chatbox').append("<p>You must enter a username to chat</p>");
+
+            var $cont = $('.chatbox');
+            $cont[0].scrollTop = $cont[0].scrollHeight;
+            $cont.append('<p>' + $(this).val() + '</p>');
+            $cont[0].scrollTop = $cont[0].scrollHeight;
+            $(this).val('');
         }
 
         return false;
@@ -125,22 +133,53 @@ $(document).ready(function () {
         }
 
         //
-        context.clearRect(0, 0, canvas.height, canvas.width);
+        console.log("clear");
+        console.log(canvas.height);
+        console.log(canvas.width);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
 
     // Announce Winner
     socket.on('winnerNotify', function(name) {
-        $('#chatbox').append('<p> Congratulations ' + name + ' on the right answer! Starting New Round! </p>');
+
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append('<p> Congratulations ' + name + ' on the right answer! Starting New Round! </p>');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
+    });
+
+    // Announce Game Start
+    socket.on('startingNotify', function() {
+        $('#chatbox'.append('<p>Game of PictoFriends has Begun!</p>'));
+
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append('<p>' + $(this).val() + '</p>');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
     });
 
     // Announce Game End
     socket.on('endingNotify', function() {
         $('#chatbox').append('<p>Game of Pictofriends has ended</p>');
+
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append('<p>' + $(this).val() + '</p>');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
     });
 
     // Update chatbox to show user has joined
     socket.on('userJoined', function (user, userlist) {
         $('#chatbox').append("<p>" + user.name + " has joined the chatroom</p>");
+
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append('<p>' + $(this).val() + '</p>');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
 
         $('#userlist').html("");
 
@@ -154,6 +193,12 @@ $(document).ready(function () {
     socket.on('userLeft', function (user, userlist) {
         $('#chatbox').append("<p>" + user + " has Disconnected</p>");
 
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append('<p>' + $(this).val() + '</p>');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
+
         $('#userlist').html("");
 
         for (var i = 0; i < userlist.length; i++) {
@@ -165,11 +210,22 @@ $(document).ready(function () {
     // Listen for Game Start
     socket.on('gameStart', function() {
         $('#chatbox'.append("<p>A new game of PictoFriends has begun!</p>"));
+
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append('<p>' + $(this).val() + '</p>');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
     });
 
     // Listen for chat messages
     socket.on('chatMessage', function (message) {
-        $('#chatbox').append("<p>" + message.name + ": " + message.text + "</p>");
+
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append("<p>" + message.name + ": " + message.text + "</p>");
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
     });
 
     // Listen for UserCount change
