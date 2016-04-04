@@ -71,6 +71,8 @@ $(document).ready(function () {
 
     // Draw using the x/y coordinates
     function draw(data) {
+        console.log(data.x);
+        console.log(data.y);
         ctx.beginPath();
         ctx.strokeStyle = data.strokeStyle;
         ctx.lineJoin = "round";
@@ -110,6 +112,12 @@ $(document).ready(function () {
             console.log("Must enter Username");
 
             $('#chatbox').append("<p>You must enter a username to chat</p>");
+
+            var $cont = $('.chatbox');
+            $cont[0].scrollTop = $cont[0].scrollHeight;
+            $cont.append('<p>' + $(this).val() + '</p>');
+            $cont[0].scrollTop = $cont[0].scrollHeight;
+            $(this).val('');
         }
 
         return false;
@@ -118,6 +126,12 @@ $(document).ready(function () {
     // Update chatbox to show user has joined
     socket.on('userJoined', function (user, userlist) {
         $('#chatbox').append("<p>" + user.name + " has joined the chatroom</p>");
+
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append('<p>' + $(this).val() + '</p>');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
 
         $('#userlist').html("");
 
@@ -131,6 +145,12 @@ $(document).ready(function () {
     socket.on('userLeft', function (user, userlist) {
         $('#chatbox').append("<p>" + user + " has Disconnected</p>");
 
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append('<p>' + $(this).val() + '</p>');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
+
         $('#userlist').html("");
 
         for (var i = 0; i < userlist.length; i++) {
@@ -139,9 +159,15 @@ $(document).ready(function () {
 
     });
 
+
     // Listen for chat messages
     socket.on('chatMessage', function (message) {
-        $('#chatbox').append("<p>" + message.name + ": " + message.text + "</p>");
+
+        var $cont = $('.chatbox');
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $cont.append("<p>" + message.name + ": " + message.text + "</p>");
+        $cont[0].scrollTop = $cont[0].scrollHeight;
+        $(this).val('');
     });
 
     // Listen for UserCount change
