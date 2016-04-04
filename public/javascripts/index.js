@@ -10,7 +10,7 @@ $(document).ready(function () {
     var drawing;
 
     // Set the client-side connection
-    var socket = io.connect('http://localhost:7292/picto');
+    var socket = io.connect('https://damp-caverns-81185.herokuapp.com/picto');
 
     // Listen for draw messages from server
     socket.on('draw', function (data) {
