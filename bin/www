@@ -290,6 +290,13 @@ var free = io
             free.emit('userLeft', user, userlist);
         });
 
+        /**
+         * Clear Board
+         */
+        socket.on('clearBoard', function() {
+            free.emit('clearBoard');
+        });
+
 
         /**
          *  List and emit that User Disconnected

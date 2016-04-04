@@ -10,7 +10,7 @@ $(document).ready(function () {
     var drawing;
 
     // Set the client-side connection
-    var socket = io.connect('https://damp-caverns-81185.herokuapp.com/freedraw');
+    var socket = io.connect('http://localhost:7292/freedraw');
 
     // Listen for draw messages from server
     socket.on('draw', function (data) {
@@ -44,6 +44,11 @@ $(document).ready(function () {
     $(".line-width").on('click', function (event) {
         event.preventDefault();
         lineWidth = $(this).attr('id')
+    });
+
+    // Clear Board
+    $("#clearBoard").on('click',  function(event) {
+        socket.emit('clearBoard');
     });
 
     // Set x/y coordinates and send data to server
@@ -168,6 +173,11 @@ $(document).ready(function () {
         $cont.append("<p>" + message.name + ": " + message.text + "</p>");
         $cont[0].scrollTop = $cont[0].scrollHeight;
         $(this).val('');
+    });
+
+    // Clear Board
+    socket.on('clearBoard', function () {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
 
     // Listen for UserCount change
