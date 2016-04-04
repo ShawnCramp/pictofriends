@@ -10,7 +10,7 @@ $(document).ready(function () {
     var drawing;
 
     // Set the client-side connection
-    var socket = io.connect('http://localhost:3000/freedraw');
+    var socket = io.connect('http://localhost:7292/freedraw');
 
     // Listen for draw messages from server
     socket.on('draw', function (data) {
