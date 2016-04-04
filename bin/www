@@ -50,79 +50,257 @@ var io = require('socket.io').listen(server.listen(port));
 var usercount = 0;
 var userlist = [];
 
+// List of drawing Ideas for Picto
+var drawingList = ["house", "tree", "sun", "dog", "clock", "basketball", "apple", "alligator",
+    "cow", "cape", "saddle", "violin", "goldfish", "mailbox", "gingerbread", "windmill", "pizza",
+    "wrench", "flamingo", "taco"];
+var drawingIndex = 0;
+var drawingUserIndex = 0;
+var drawingUser = "";
+var gameInProgress = false;
+
 /**
- * Socket.io Event Handler
+ * Socket.io Event Handler Picto
  */
-io.sockets.on("connection", function (socket) {
+var picto = io
+    .of('/picto')
+    .on("connection", function (socket) {
 
-    /* ---------------------------
-        Run On Socket Connection
-    --------------------------- */
-    console.log("A User has Connected");
-    usercount += 1;
-    io.emit('user count', userlist.length);
+        /* ---------------------------
+            Run On Socket Connection
+        --------------------------- */
+        console.log("A User has Connected");
+        usercount += 1;
+        picto.emit('userCount', userlist.length);
 
+        /**
+         *  Listen/emit for Canvas
+         */
+        socket.on('draw', function (data) {
+            console.log("on draw from the server");
+            console.log("Data Drawing User: " + data.name);
 
-    /**
-     *  Listen/emit for Canvas
-     */
-    socket.on('draw', function (data) {
-        console.log("on draw from the server");
-        // Data is sent in as: {x: data.x, y: data.y, type: data.type }
-        io.emit('draw', data);
-    });
+            if (data.name == drawingUser) {
+                // Data is sent in as: {x: data.x, y: data.y, type: data.type }
+                picto.emit('draw', data);
+            }
 
-
-    /**
-     *  Listen/emit for Chat
-     */
-    socket.on('chat message', function(message){
-        io.emit('chat message', message);
-    });
+        });
 
 
-    /**
-     *  Listen and emit that user joined
-     */
-    socket.on('user joined', function(user) {
+        /**
+         *  Listen/emit for Chat
+         */
+        socket.on('chatMessage', function(message){
 
-        // Add User to Userlist
-        userlist.push(user.name);
+            // Handle
+            if (gameInProgress == true) {
 
-        // Log Userlist for Debug
-        console.log("User List: " + userlist);
+                // Log Game Progress
+                console.log("Game in Progress: " + gameInProgress);
+                console.log("Current Drawing: " + drawingList[drawingIndex]);
 
-        io.emit('user joined', user, userlist)
-    });
+                if (message.text == drawingList[drawingIndex] && message.name != drawingUser) {
+                    newRound(message.name);
+                }
 
-    /**
-     *  Listen and emit that user has left
-     */
-    socket.on('user left', function(user) {
-        console.log('User Left');
-        console.log(user);
+            }
 
-        // Edit Userlist
-        if (user != "") {
-            userlist.remove(user);
+            picto.emit('chatMessage', message);
+        });
+
+        /**
+         *  Listen and emit that user joined
+         */
+        socket.on('userJoined', function(user) {
+
+            // Add User to Userlist
+            userlist.push(user.name);
+
+            // Log Userlist for Debug
             console.log("User List: " + userlist);
+
+            // Start Game if User Count is 2 or more and game not in progress
+            if (userlist.length >= 2 && gameInProgress == false) {
+                startPicto();
+            }
+
+            // Send User Joined Chat
+            picto.emit('userJoined', user, userlist)
+        });
+
+        /**
+         *  Listen and emit that user has left
+         */
+        socket.on('userLeft', function(user) {
+            console.log('User Left');
+            console.log(user);
+
+            // Edit Userlist
+            if (user != "") {
+                userlist.remove(user);
+                console.log("User List: " + userlist);
+            }
+
+            picto.emit('userLeft', user, userlist);
+        });
+
+
+        /**
+         *  List and emit that User Disconnected
+         */
+        socket.on('disconnect', function(user) {
+            console.log("User Disconnected");
+            console.log("User List Length: " + userlist.length.toString());
+
+            if (userlist.length < 2) {
+                endPicto();
+            }
+
+            picto.emit('userCount', userlist.length);
+        });
+
+
+        /**
+         * Handle Start of Picto Game
+         */
+        function startPicto () {
+
+            //
+            console.log("Starting Picto Game");
+            gameInProgress = true;
+            drawingUserIndex = 0;
+            drawingIndex = 0;
+            drawingUser = userlist[drawingUserIndex];
+
+            // Log Current Drawing User
+            console.log("Current Drawing User: " + drawingUser);
+            console.log("Current Drawing: " + drawingList[drawingIndex]);
+
+            // Emit Current Drawing User and Current Drawing
+            picto.emit('gameStart');
+            picto.emit('drawingUser', drawingList[drawingIndex], drawingUser);
         }
 
-        io.emit('user left', user, userlist);
+        /**
+         * Handle New Round of Picto Game
+         */
+        function newRound (name) {
+
+            // Sanity
+            console.log("New Round");
+
+            drawingUserIndex += 1;
+            drawingIndex += 1;
+            if (drawingUserIndex >= userlist.length) {
+                drawingUserIndex = 0;
+            }
+            if (drawingIndex >= drawingList.length) {
+                drawingIndex = 0;
+            }
+
+            // Set new Drawer and Idea
+            drawingUser = userlist[drawingUserIndex];
+
+            // Log Current Drawing User
+            console.log("Current Drawing User: " + drawingUser);
+            console.log("Current Drawing: " + drawingList[drawingIndex]);
+
+            picto.emit('winnerNotify', name);
+            picto.emit('drawingUser', drawingList[drawingIndex], drawingUser);
+        }
+
+        /**
+         * Handle Ending Picto Game
+         */
+        function endPicto () {
+            gameInProgress = false;
+            drawingUserIndex = 0;
+            drawingIndex = 0;
+            drawingUser = "";
+
+            picto.emit('endingNotify');
+            picto.emit('drawingUser', "", "");
+        }
     });
 
 
-    /**
-     *  List and emit that User Disconnected
-     */
-    socket.on('disconnect', function(user) {
-        console.log("User Disconnected");
-        console.log("User List Length: " + userlist.length.toString());
-        io.emit('user count', userlist.length);
+/**
+ * Socket.io Event Handler Picto
+ */
+var free = io
+    .of('/freedraw')
+    .on("connection", function (socket) {
+
+        /* ---------------------------
+         Run On Socket Connection
+         --------------------------- */
+        console.log("A User has Connected");
+        usercount += 1;
+        free.emit('userCount', userlist.length);
+
+        /**
+         *  Listen/emit for Canvas
+         */
+        socket.on('draw', function (data) {
+            console.log("on draw from the server");
+            console.log("Data Drawing User: " + data.name);
+
+            free.emit('draw', data);
+        });
+
+
+        /**
+         *  Listen/emit for Chat
+         */
+        socket.on('chatMessage', function(message){
+
+            free.emit('chatMessage', message);
+        });
+
+        /**
+         *  Listen and emit that user joined
+         */
+        socket.on('userJoined', function(user) {
+
+            // Add User to Userlist
+            userlist.push(user.name);
+
+            // Log Userlist for Debug
+            console.log("User List: " + userlist);
+
+            // Send User Joined Chat
+            free.emit('userJoined', user, userlist)
+        });
+
+        /**
+         *  Listen and emit that user has left
+         */
+        socket.on('userLeft', function(user) {
+            console.log('User Left');
+            console.log(user);
+
+            // Edit Userlist
+            if (user != "") {
+                userlist.remove(user);
+                console.log("User List: " + userlist);
+            }
+
+            free.emit('userLeft', user, userlist);
+        });
+
+
+        /**
+         *  List and emit that User Disconnected
+         */
+        socket.on('disconnect', function(user) {
+            console.log("User Disconnected");
+            console.log("User List Length: " + userlist.length.toString());
+
+            free.emit('userCount', userlist.length);
+        });
+
     });
-});
-
-
 
 
 /**

@@ -1,33 +1,32 @@
 $(document).ready(function () {
-// Capture the DOM elements
+
+    // Capture the DOM elements
     var canvas = document.getElementById("canvas");
+
     var ctx = canvas.getContext("2d");
     var $canvas = $("#canvas");
     var strokeStyle = "black";
     var lineWidth = 10;
     var drawing;
 
-// Set the client-side connection
+    // Set the client-side connection
     var socket = io.connect('http://localhost:3000/picto');
 
-// Listen for draw messages from server
+    // Listen for draw messages from server
     socket.on('draw', function (data) {
         console.log("User Drew Something...");
         draw(data);
     });
 
-
-
-// Begin draw
+    // Begin draw
     $canvas.mousedown(function (event) {
         drawing = true;
-
         currentX = event.pageX - this.offsetLeft;
         currentY = event.pageY - this.offsetTop;
 
     });
 
-// End draw
+    // End draw
     $canvas.mouseup(function (event) {
         drawing = false;
     });
@@ -47,7 +46,7 @@ $(document).ready(function () {
         lineWidth = $(this).attr('id')
     });
 
-// Set x/y coordinates and send data to server
+    // Set x/y coordinates and send data to server
     $canvas.mousemove(function (event) {
 
         if (drawing) {
@@ -62,14 +61,15 @@ $(document).ready(function () {
                 prevX: prevX,
                 prevY: prevY,
                 strokeStyle: strokeStyle,
-                lineWidth: lineWidth
+                lineWidth: lineWidth,
+                name: name
             });
             console.log("from emit");
         }
 
     });
 
-// Draw using the x/y coordinates
+    // Draw using the x/y coordinates
     function draw(data) {
         ctx.beginPath();
         ctx.strokeStyle = data.strokeStyle;
@@ -90,7 +90,7 @@ $(document).ready(function () {
 
         // Emit that user has joined
         var user = {name: name};
-        socket.emit('user joined', user);
+        socket.emit('userJoined', user);
     });
 
 // Send chat messages
@@ -104,7 +104,7 @@ $(document).ready(function () {
             console.log("Message Sent");
             console.log(message.name);
 
-            socket.emit('chat message', message);
+            socket.emit('chatMessage', message);
             $('#message').val('');
         } else {
             console.log("Must enter Username");
@@ -114,9 +114,32 @@ $(document).ready(function () {
 
         return false;
     });
+    
+    // Display Currently Drawing User
+    socket.on('drawingUser', function (idea, user) {
+        console.log('Idea: ' + idea + " User: " + user);
+        if (user == name) {
+            $('#currentDrawing').html("<b>" + user + "</b> you're drawing: " + idea);
+        } else {
+            $('#currentDrawing').html('<b>' + user + '</b>')
+        }
+
+        //
+        context.clearRect(0, 0, canvas.height, canvas.width);
+    });
+
+    // Announce Winner
+    socket.on('winnerNotify', function(name) {
+        $('#chatbox').append('<p> Congratulations ' + name + ' on the right answer! Starting New Round! </p>');
+    });
+
+    // Announce Game End
+    socket.on('endingNotify', function() {
+        $('#chatbox').append('<p>Game of Pictofriends has ended</p>');
+    });
 
     // Update chatbox to show user has joined
-    socket.on('user joined', function (user, userlist) {
+    socket.on('userJoined', function (user, userlist) {
         $('#chatbox').append("<p>" + user.name + " has joined the chatroom</p>");
 
         $('#userlist').html("");
@@ -128,8 +151,8 @@ $(document).ready(function () {
     });
 
     // Update chatbox to show user has left
-    socket.on('user left', function (user, userlist) {
-        $('#chatbox').append("<p>" + user + "  has Disconnected</p>");
+    socket.on('userLeft', function (user, userlist) {
+        $('#chatbox').append("<p>" + user + " has Disconnected</p>");
 
         $('#userlist').html("");
 
@@ -139,19 +162,24 @@ $(document).ready(function () {
 
     });
 
+    // Listen for Game Start
+    socket.on('gameStart', function() {
+        $('#chatbox'.append("<p>A new game of PictoFriends has begun!</p>"));
+    });
+
     // Listen for chat messages
-    socket.on('chat message', function (message) {
+    socket.on('chatMessage', function (message) {
         $('#chatbox').append("<p>" + message.name + ": " + message.text + "</p>");
     });
 
     // Listen for UserCount change
-    socket.on('user count', function (count) {
+    socket.on('userCount', function (count) {
         $('#usercount').html(count);
     });
 
     // Call on Browser Closure
     window.onbeforeunload = function() {
-        socket.emit('user left', name);
+        socket.emit('userLeft', name);
     };
 
 }); // end document ready
